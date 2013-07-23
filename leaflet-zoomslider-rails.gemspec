@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.version       = Leaflet::Zoomslider::Rails::VERSION
   gem.authors       = ["Klaas Endrikat"]
   gem.email         = ["klaas.endrikat@googlemail.com"]
-  gem.description   = %q{Integrate the Leaflet ZoomSlider plugin into the Rails asset pipeline}
+  gem.description   = %q{Integrates the Leaflet ZoomSlider plugin with Rails asset pipeline}
   gem.summary       = %q{Leaflet ZoomSlider plugin for Rails}
   gem.license       = 'MIT'
   gem.homepage      = "https://github.com/kendrikat/leaflet-zoomslider-rails"
