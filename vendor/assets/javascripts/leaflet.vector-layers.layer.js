@@ -549,49 +549,11 @@ lvector.Layer = L.Class.extend({
             this._clearFeatures();
         }
 
-        // If necessary, convert data to make it look like a GeoJSON FeatureCollection
-        // PRWSF returns GeoJSON, but not in a FeatureCollection. Make it one.
-        if (this instanceof lvector.PRWSF) {
-            data.features = data.rows;
-            delete data.rows;
-            for (var i = 0, len = data.features.length; i < len; i++) {
-                data.features[i].type = "Feature"; // Not really necessary, but let's follow the GeoJSON spec for a Feature
-                data.features[i].properties = {};
-                for (var prop in data.features[i].row) {
-                    if (prop == "geojson") {
-                        data.features[i].geometry = data.features[i].row.geojson;
-                    } else {
-                        data.features[i].properties[prop] = data.features[i].row[prop];
-                    }
-                }
-                delete data.features[i].row;
-            }
-        }
-        // GISCloud returns GeoJSON, but not in a FeatureCollection. Make it one.
-        if (this instanceof lvector.GISCloud) {
-            data.features = data.data;
-            delete data.data;
-            for (var i = 0, len = data.features.length; i < len; i++) {
-                data.features[i].type = "Feature"; // Not really necessary, but let's follow the GeoJSON spec for a Feature
-                data.features[i].properties = data.features[i].data;
-                data.features[i].properties.id = data.features[i].__id;
-                delete data.features[i].data;
-                data.features[i].geometry = data.features[i].__geometry;
-                delete data.features[i].__geometry;
-            }
-        }
-
         // If "data.features" exists and there's more than one feature in the array
         if (data && data.features && data.features.length) {
 
             // Loop through the return features
             for (var i = 0; i < data.features.length; i++) {
-
-                // if AGS layer type assigned "attributes" to "properties" to keep everything looking like GeoJSON Features
-                if (this instanceof lvector.EsriJSONLayer) {
-                    data.features[i].properties = data.features[i].attributes;
-                    delete data.features[i].attributes;
-                }
 
                 // All objects are assumed to be false until proven true (remember COPS?)
                 var onMap = false,

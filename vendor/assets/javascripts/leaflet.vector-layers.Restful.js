@@ -13,17 +13,16 @@ lvector.Restful = lvector.GeoJSONLayer.extend({
             options.url += "/";
         }
 
-        // Extend Layer to create PRWSF
+        // Extend Layer to create Restful
         lvector.Layer.prototype.initialize.call(this, options);
 
         // _globalPointer is a string that points to a global function variable
         // Features returned from a JSONP request are passed to this function
-        this._globalPointer = "PRWSF_" + Math.floor(Math.random() * 100000);
+        this._globalPointer = "Restful_" + Math.floor(Math.random() * 100000);
         window[this._globalPointer] = this;
 
         // Create an array to hold the features
         this._vectors = [];
-
 
         if (this.options.map) {
             if (this.options.scaleRange && this.options.scaleRange instanceof Array && this.options.scaleRange.length === 2) {
@@ -36,49 +35,70 @@ lvector.Restful = lvector.GeoJSONLayer.extend({
     },
 
     options: {
-        geotable: null,
+        spatialQuery: 'attributes',
+        table: null,
         srid: null,
-        geomFieldName: "the_geom",
-        geomPrecision: "",
-        fields: "",
+        geomFieldName: null,
+        geomPrecision: null,
+        fields: null,
         where: null,
         limit: null,
-        uniqueField: null
+        order: null,
+        uniqueField: null,
+        showAll: null
     },
 
-    _requiredParams: ["url", "geotable"],
+    _requiredParams: ["url", "table"],
 
     _getFeatures: function() {
+        // Build URL
+        var url = this.options.url + "query" + // The postgis query server endpoint
+            "?spatialquery=" + this.options.spatialQuery + // the attribute query service
+            "&table=" + this.options.table + // the source gis table
+            "&format=json" + // JSON please
+            "&callback=" + this._globalPointer + "._processFeatures"; // Need this for JSONP
 
-        // Build Query
-        var where = this.options.where || "";
         if (!this.options.showAll) {
             var bounds = this.options.map.getBounds();
             var sw = bounds.getSouthWest();
             var ne = bounds.getNorthEast();
-            where += where.length ? " AND " : "";
-            if (this.options.srid) {
-                where += this.options.geomFieldName + " && transform(st_setsrid(st_makebox2d(st_point(" + sw.lng + "," + sw.lat + "),st_point(" + ne.lng + "," + ne.lat + ")),4326)," + this.options.srid + ")";
-            } else {
-                where += "transform(" + this.options.geomFieldName + ",4326) && st_setsrid(st_makebox2d(st_point(" + sw.lng + "," + sw.lat + "),st_point(" + ne.lng + "," + ne.lat + ")),4326)";
-            }
+            var minx = sw.lng
+            var miny = sw.lat
+            var maxx = ne.lng
+            var maxy = ne.lat
+            url += "&minx=" + encodeURIComponent(minx) // sw lng
+            url += "&miny=" + encodeURIComponent(miny) // sw lat
+            url += "&maxx=" + encodeURIComponent(maxx) // ne lng
+            url += "&maxy=" + encodeURIComponent(maxy) // ne lat
         }
 
-        // Limit returned features
+        if (this.options.geomFieldName) {
+            url += "&the_geom=" + encodeURIComponent(this.options.geomFieldName);
+        }
+
+        if (this.options.srid) {
+            url += "&srid=" + encodeURIComponent(this.options.srid);
+        }
+
+        if (this.options.fields) {
+            url += "&fields=" + encodeURIComponent(this.options.fields);
+        }
+
+        if (this.options.geomPrecision) {
+            url += "&precision=" + encodeURIComponent(this.options.geomPrecision);
+        }
+
+        if (this.options.where) {
+            url += "&where=" + encodeURIComponent(this.options.where);
+        }
+
+        if (this.options.order) {
+            url += "&order=" + encodeURIComponent(this.options.order);
+        }
+
         if (this.options.limit) {
-            where += (where.length ? " " : "") + "limit " + this.options.limit;
+            url += "&limit=" + encodeURIComponent(this.options.limit);
         }
-
-        // Build fields
-        var fields = (this.options.fields.length ? this.options.fields + "," : "") + "st_asgeojson(transform(" + this.options.geomFieldName + ",4326)" + (this.options.geomPrecision ? "," + this.options.geomPrecision : "") + ") as geojson";
-
-        // Build URL
-        var url = this.options.url + "v1/ws_geo_attributequery.php" + // The attribute query service
-            "?parameters=" + encodeURIComponent(where) + // The SQL where statement
-            "&geotable=" + this.options.geotable + // The table name
-            "&fields=" + encodeURIComponent(fields) + //
-            "&format=json" + // JSON please
-            "&callback=" + this._globalPointer + "._processFeatures"; // Need this for JSONP
 
         // JSONP request
         this._makeJsonpRequest(url);
