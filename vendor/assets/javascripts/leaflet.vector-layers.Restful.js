@@ -51,6 +51,9 @@ lvector.Restful = lvector.GeoJSONLayer.extend({
     _requiredParams: ["url", "table"],
 
     _getFeatures: function() {
+        if (!this.options.map) {
+            return; // The layer is not present on the map, so do nothing.
+        }
         // Build URL
         var url = this.options.url + "query" + // The postgis query server endpoint
             "?spatialquery=" + this.options.spatialQuery + // the attribute query service

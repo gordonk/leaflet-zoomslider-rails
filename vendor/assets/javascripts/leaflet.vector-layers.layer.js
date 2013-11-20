@@ -220,6 +220,9 @@ lvector.Layer = L.Class.extend({
     // Get the current map zoom and check to see if the layer should still be visible
     //
     _checkLayerVisibility: function() {
+        if (!this.options.map) {
+            return; // The layer is not present on the map, so do nothing.
+        }
         //
         // Store current visibility so we can see if it changed
         //
