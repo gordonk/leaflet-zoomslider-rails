@@ -37,6 +37,7 @@ lvector.Restful = lvector.GeoJSONLayer.extend({
     options: {
         spatialQuery: 'attributes',
         table: null,
+        project: null,
         srid: null,
         geomFieldName: null,
         geomPrecision: null,
@@ -48,7 +49,7 @@ lvector.Restful = lvector.GeoJSONLayer.extend({
         showAll: null
     },
 
-    _requiredParams: ["url", "table"],
+    _requiredParams: ["url", "table", "project"],
 
     _getFeatures: function() {
         if (!this.options.map) {
@@ -58,6 +59,7 @@ lvector.Restful = lvector.GeoJSONLayer.extend({
         var url = this.options.url + "query" + // The postgis query server endpoint
             "?spatialquery=" + this.options.spatialQuery + // the attribute query service
             "&table=" + this.options.table + // the source gis table
+            "&project=" + this.options.project + // the source project
             "&format=json" + // JSON please
             "&callback=" + this._globalPointer + "._processFeatures"; // Need this for JSONP
 
