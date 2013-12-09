@@ -389,6 +389,20 @@ lvector.Layer = L.Class.extend({
     },
 
     //
+    // Optional mouseover event
+    //
+    _fireMouseoverEvent: function (feature, event) {
+        this.options.mouseoverEvent(feature, event)
+    },
+
+    //
+    // Optional mouseout event
+    //
+    _fireMouseoutEvent: function (feature, event) {
+        this.options.mouseoutEvent(feature, event)
+    },
+
+    //
     // Get the appropriate Google Maps vector options for this feature
     //
     _getFeatureVectorOptions: function(feature) {
@@ -692,6 +706,47 @@ lvector.Layer = L.Class.extend({
                                 for (var i3 = 0, len = feature.vectors.length; i3 < len; i3++) {
                                     feature.vectors[i3].on("click", function(event) {
                                         me._fireClickEvent(feature, event);
+                                    });
+                                }
+                            }
+                        }(feature));
+
+                    }
+
+                    if (this.options.mouseoverEvent) {
+                        var me = this;
+                        var feature = data.features[i];
+
+                        (function(feature){
+                            if (feature.vector) {
+                                feature.vector.on("mouseover", function(event) {
+                                    me._fireMouseoverEvent(feature, event);
+                                });
+                            } else if (feature.vectors) {
+                                for (var i3 = 0, len = feature.vectors.length; i3 < len; i3++) {
+                                    feature.vectors[i3].on("mouseover", function(event) {
+                                        me._fireMouseoverEvent(feature, event);
+                                    });
+                                }
+                            }
+                        }(feature));
+
+                    }
+
+                    if (this.options.mouseoutEvent) {
+
+                        var me = this;
+                        var feature = data.features[i];
+
+                        (function(feature){
+                            if (feature.vector) {
+                                feature.vector.on("mouseout", function(event) {
+                                    me._fireMouseoutEvent(feature, event);
+                                });
+                            } else if (feature.vectors) {
+                                for (var i3 = 0, len = feature.vectors.length; i3 < len; i3++) {
+                                    feature.vectors[i3].on("mouseout", function(event) {
+                                        me._fireMouseoutEvent(feature, event);
                                     });
                                 }
                             }
