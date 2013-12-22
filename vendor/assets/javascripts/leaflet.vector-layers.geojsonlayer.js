@@ -5,7 +5,10 @@ lvector.GeoJSONLayer = lvector.Layer.extend({
     //
     // Convert GeoJSON to Leaflet vectors
     //
-    _geoJsonGeometryToLeaflet: function(geometry, opts) {
+    _geoJsonGeometryToLeaflet: function(geometry, opts, data) {
+        // Set data as a option property
+        opts.data = data
+        
         //
         // Create a variable for a single vector and for multi part vectors.
         //

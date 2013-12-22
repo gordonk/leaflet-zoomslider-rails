@@ -20,7 +20,8 @@ lvector.Layer = L.Class.extend({
         popupOptions: {},
         singlePopup: false,
         symbology: null,
-        showAll: false
+        showAll: false,
+        includeDataOption: false
     },
 
     initialize: function(options) {
@@ -649,7 +650,8 @@ lvector.Layer = L.Class.extend({
 
                     if (this instanceof lvector.GeoJSONLayer) {
                     // Convert GeoJSON to Leaflet vector (Point, Polyline, Polygon)
-                        var vector_or_vectors = this._geoJsonGeometryToLeaflet(data.features[i].geometry, this._getFeatureVectorOptions(data.features[i]));
+                        var dataOption = this.options.includeDataOption ? data.features[i] : null;
+                        var vector_or_vectors = this._geoJsonGeometryToLeaflet(data.features[i].geometry, this._getFeatureVectorOptions(data.features[i]), dataOption);
                         data.features[i][vector_or_vectors instanceof Array ? "vectors" : "vector"] = vector_or_vectors;
                     } else if (this instanceof lvector.EsriJSONLayer) {
                         // Convert Esri JSON to Google Maps vector (Point, Polyline, Polygon)
