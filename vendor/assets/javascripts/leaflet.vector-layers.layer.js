@@ -20,7 +20,7 @@ lvector.Layer = L.Class.extend({
         popupOptions: {},
         singlePopup: false,
         symbology: null,
-        showAll: false
+        showAll: false,
         includeDataOption: false
     },
 
