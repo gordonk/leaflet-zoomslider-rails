@@ -169,7 +169,8 @@ L.Map.ContextMenu = L.Handler.extend({
     if (options.icon) {
       html = '<img class="' + L.Map.ContextMenu.BASE_CLS + '-icon" src="' + options.icon + '"/>';
     } else if (options.iconCls) {
-      html = '<span class="' + L.Map.ContextMenu.BASE_CLS + '-icon ' + options.iconCls + '"></span>';
+      //html = '<span class="' + L.Map.ContextMenu.BASE_CLS + '-icon ' + options.iconCls + '"></span>';
+      html = '<i class="' + options.iconCls + ' icon"></i>';
     }
 
     el.innerHTML = html + options.text;
