@@ -82,7 +82,8 @@ L.Map.ContextMenu = L.Handler.extend({
     this._map.fire('contextmenu.additem', {
       contextmenu: this,
       el: item.el,
-      index: index
+      index: index,
+      data: options.data
     });
 
     return item.el;
@@ -163,7 +164,7 @@ L.Map.ContextMenu = L.Handler.extend({
     var itemCls = L.Map.ContextMenu.BASE_CLS + '-item',
         cls = options.disabled ? (itemCls + ' ' + itemCls + '-disabled') : itemCls,
         el = this._insertElementAt('a', cls, container, index),
-        callback = this._createEventHandler(el, options.callback, options.context, options.hideOnSelect),
+        callback = this._createEventHandler(el, options.callback, options.context, options.data),
         html = '';
 
     if (options.icon) {
@@ -229,28 +230,24 @@ L.Map.ContextMenu = L.Handler.extend({
     };
   },
 
-  _createEventHandler: function (el, func, context, hideOnSelect) {
+  _createEventHandler: function (el, func, context, data) {
     var me = this,
         map = this._map,
-        disabledCls = L.Map.ContextMenu.BASE_CLS + '-item-disabled',
-        hideOnSelect = (hideOnSelect !== undefined) ? hideOnSelect : true;
+        disabledCls = L.Map.ContextMenu.BASE_CLS + '-item-disabled';
 
     return function (e) {
       if (L.DomUtil.hasClass(el, disabledCls)) {
         return;
       }
 
-      if (hideOnSelect) {
-        me._hide();
-      }
+      me._hide();
 
-      if (func) {
-        func.call(context || map, me._showLocation);
-      }
+      func.call(context || map, me._showLocation, data);
 
       me._map.fire('contextmenu:select', {
         contextmenu: me,
-        el: el
+        el: el,
+        data: data
       });
     };
   },
